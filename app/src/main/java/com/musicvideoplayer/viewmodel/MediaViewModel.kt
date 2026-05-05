@@ -57,6 +57,12 @@ class MediaViewModel(application: Application) : AndroidViewModel(application) {
                 _videoFiles.value = if (_showFavoritesOnly.value) {
                     video.filter { it.isFavorite }
                 } else video
+            } catch (_: SecurityException) {
+                _audioFiles.value = emptyList()
+                _videoFiles.value = emptyList()
+            } catch (_: Exception) {
+                _audioFiles.value = emptyList()
+                _videoFiles.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

@@ -52,6 +52,7 @@ class MediaRepository(private val context: Context) {
 
     private fun queryAudioFiles(favoriteIds: Set<String>): List<MediaItem> {
         val items = mutableListOf<MediaItem>()
+        try {
         val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
         } else {
@@ -113,11 +114,17 @@ class MediaRepository(private val context: Context) {
                 )
             }
         }
+        } catch (_: SecurityException) {
+            // Permissions not yet granted
+        } catch (_: Exception) {
+            // Handle any other query errors gracefully
+        }
         return items
     }
 
     private fun queryVideoFiles(favoriteIds: Set<String>): List<MediaItem> {
         val items = mutableListOf<MediaItem>()
+        try {
         val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
         } else {
@@ -166,6 +173,11 @@ class MediaRepository(private val context: Context) {
                     )
                 )
             }
+        }
+        } catch (_: SecurityException) {
+            // Permissions not yet granted
+        } catch (_: Exception) {
+            // Handle any other query errors gracefully
         }
         return items
     }
