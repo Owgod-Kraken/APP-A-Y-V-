@@ -86,9 +86,6 @@ dependencies {
     // Material (XML theme support)
     implementation("com.google.android.material:material:1.11.0")
 
-    // Accompanist (permissions)
-    implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
-
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

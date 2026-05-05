@@ -17,7 +17,13 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
 
-    val exoPlayer: ExoPlayer = ExoPlayer.Builder(application).build()
+    val exoPlayer: ExoPlayer = try {
+        ExoPlayer.Builder(application).build()
+    } catch (e: Exception) {
+        ExoPlayer.Builder(application)
+            .setHandleAudioBecomingNoisy(false)
+            .build()
+    }
 
     private val _currentItem = MutableStateFlow<MediaItem?>(null)
     val currentItem: StateFlow<MediaItem?> = _currentItem.asStateFlow()
@@ -44,25 +50,33 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     val shuffleEnabled: StateFlow<Boolean> = _shuffleEnabled.asStateFlow()
 
     init {
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_READY) {
-                    _duration.value = exoPlayer.duration.coerceAtLeast(0)
+        try {
+            exoPlayer.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_READY) {
+                        _duration.value = exoPlayer.duration.coerceAtLeast(0)
+                    }
+                    if (playbackState == Player.STATE_ENDED) {
+                        playNext()
+                    }
                 }
-                if (playbackState == Player.STATE_ENDED) {
-                    playNext()
-                }
-            }
 
-            override fun onIsPlayingChanged(playing: Boolean) {
-                _isPlaying.value = playing
-            }
-        })
+                override fun onIsPlayingChanged(playing: Boolean) {
+                    _isPlaying.value = playing
+                }
+            })
+        } catch (_: Exception) {
+            // Gracefully handle listener registration failure
+        }
 
         viewModelScope.launch {
             while (isActive) {
-                if (exoPlayer.isPlaying) {
-                    _currentPosition.value = exoPlayer.currentPosition.coerceAtLeast(0)
+                try {
+                    if (exoPlayer.isPlaying) {
+                        _currentPosition.value = exoPlayer.currentPosition.coerceAtLeast(0)
+                    }
+                } catch (_: Exception) {
+                    // Ignore player state read errors
                 }
                 delay(250)
             }

@@ -143,13 +143,26 @@ fun MusicVideoPlayerTheme(
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
-    val colorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = if (isDark) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                dynamicDarkColorScheme(LocalContext.current)
+            } else {
+                darkColorSchemeForTheme(themeColor)
+            }
+        } catch (_: Exception) {
+            darkColorSchemeForTheme(themeColor)
         }
-        isDark -> darkColorSchemeForTheme(themeColor)
-        else -> lightColorSchemeForTheme(themeColor)
+    } else {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                dynamicLightColorScheme(LocalContext.current)
+            } else {
+                lightColorSchemeForTheme(themeColor)
+            }
+        } catch (_: Exception) {
+            lightColorSchemeForTheme(themeColor)
+        }
     }
 
     MaterialTheme(
