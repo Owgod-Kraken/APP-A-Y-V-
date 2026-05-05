@@ -23,21 +23,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.musicvideoplayer.data.model.MediaItem
 import com.musicvideoplayer.ui.components.MiniPlayer
 import com.musicvideoplayer.ui.navigation.Screen
@@ -136,13 +136,11 @@ fun MainApp(settingsViewModel: SettingsViewModel) {
     )
     val showMiniPlayer = currentItem != null && currentItem?.isAudio == true &&
         currentRoute != Screen.AudioPlayer.route &&
-        currentRoute != Screen.VideoPlayer.route.substringBefore("/")
+        currentRoute != "video_player/{mediaId}"
 
     // Load media on start
-    var mediaLoaded by remember { mutableStateOf(false) }
-    if (!mediaLoaded) {
+    LaunchedEffect(Unit) {
         mediaViewModel.loadMedia()
-        mediaLoaded = true
     }
 
     Scaffold(
@@ -247,7 +245,12 @@ fun MainApp(settingsViewModel: SettingsViewModel) {
                     )
                 }
 
-                composable(Screen.VideoPlayer.route) {
+                composable(
+                    route = Screen.VideoPlayer.route,
+                    arguments = listOf(
+                        navArgument("mediaId") { type = NavType.LongType }
+                    )
+                ) {
                     VideoPlayerScreen(
                         playerViewModel = playerViewModel,
                         onBack = { navController.popBackStack() }

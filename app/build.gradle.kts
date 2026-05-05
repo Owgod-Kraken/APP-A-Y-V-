@@ -83,6 +83,9 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
+    // Material (XML theme support)
+    implementation("com.google.android.material:material:1.11.0")
+
     // Accompanist (permissions)
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 

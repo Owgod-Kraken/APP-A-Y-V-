@@ -1,3 +1,3 @@
 # Add project specific ProGuard rules here.
--keepattributes *Annotation*
--keep class androidx.media3.** { *; }
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.kts.
